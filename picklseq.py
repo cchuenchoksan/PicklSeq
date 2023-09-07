@@ -1,14 +1,35 @@
-import pandas as pd
 import subprocess
 import re
 import pickle
+import sys
 
-process = subprocess.Popen(['bash', './command_chopper.sh'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-process.wait() # Wait for process to complete.
+# Take arguments
+file_name = sys.argv[1]
+seq_type = sys.argv[2]
+
+if seq_type == "DHPS":
+    fasta_file = "./utils/DHPS.fasta"
+elif seq_type == "DHFR":
+    fasta_file = "./utils/DHFR.fasta"
+elif seq_type == "CRT":
+    fasta_file = "./utils/CRT.fasta"
+
+print(file_name)
+print(fasta_file)
+
+process = subprocess.Popen(['bash', "./utils/commands.sh", file_name, fasta_file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+stdout, stderr = process.communicate()
+
+print("Standard Output:")
+print(stdout.decode())
+print(stderr.decode())
+
+process.wait()
 print("Process Completed ################################################################")
+
 cigar_num_pattern = r"\d+"
 cigar_alpha_pattern = r"[A-Z]"
-seq_len = 642
+seq_len = 178
 
 def get_match_count(cigar_nums, cigar_alphas):
     output = 0
@@ -37,12 +58,10 @@ with open('./sorted_example_alignment.txt', 'r') as f:
             interested = [line_array[2], cigar_str, dna_seq[:seq_len]]
             if flag in [0, 1, 16, 2048, 2064]:
                 if get_match_count(cigar_nums, cigar_alphas) > 0:
-                    if pos == 1: # will need to pad
+                    if pos == 1:  # will need to pad
                         data.append(interested)
 
 print(len(data))
 
-# Open a file in binary mode
-with open("trimmed_data_mix2.pkl", "wb") as file:
-    # Dump the list to the file using pickle
+with open("output.pkl", "wb") as file:
     pickle.dump(data, file)
