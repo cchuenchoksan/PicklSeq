@@ -2,34 +2,50 @@ import subprocess
 import re
 import pickle
 import sys
+import os
+
+current_file = os.path.abspath(__file__)
+current_directory = os.path.dirname(current_file)
 
 # Take arguments
 file_name = sys.argv[1]
-seq_type = sys.argv[2]
+try:
+    seq_type = sys.argv[2]
+except IndexError:
+    print(f"WARNING: A sequence type was not given. Defaulting to CRT.")
+    seq_type = "CRT"
 
 if seq_type == "DHPS":
-    fasta_file = "./utils/DHPS.fasta"
+    fasta_file = f"{current_directory}/utils/DHPS.fasta"
+    seq_len = 642
 elif seq_type == "DHFR":
-    fasta_file = "./utils/DHFR.fasta"
+    fasta_file = f"{current_directory}/utils/DHFR.fasta"
+    seq_len = 491
 elif seq_type == "CRT":
-    fasta_file = "./utils/CRT.fasta"
+    fasta_file = f"{current_directory}/utils/CRT.fasta"
+    seq_len = 178
+else:
+    print(
+        f"WARNING: The sequence type {seq_type} is not recognised by the script. Defaulting to CRT.")
+    fasta_file = f"{current_directory}/utils/CRT.fasta"
+    seq_len = 178
 
-print(file_name)
-print(fasta_file)
+print("Running subprocess...")
 
-process = subprocess.Popen(['bash', "./utils/commands.sh", file_name, fasta_file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+process = subprocess.Popen(['bash', f"{current_directory}/utils/commands.sh", file_name,
+                           fasta_file, current_directory], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 stdout, stderr = process.communicate()
 
-print("Standard Output:")
+print("#####Process Completed#####")
+print("Subprocess Output:")
 print(stdout.decode())
 print(stderr.decode())
 
-process.wait()
-print("Process Completed ################################################################")
+print("Start picklseq trimming...")
 
 cigar_num_pattern = r"\d+"
 cigar_alpha_pattern = r"[A-Z]"
-seq_len = 178
+
 
 def get_match_count(cigar_nums, cigar_alphas):
     output = 0
@@ -38,8 +54,9 @@ def get_match_count(cigar_nums, cigar_alphas):
             output += int(num)
     return output
 
+
 data = []
-with open('./sorted_example_alignment.txt', 'r') as f:
+with open(f"{current_directory}/sorted_alignment.txt", "r") as f:
     for line in f:
         line_array = line.split('\t')
         flag = int(line_array[1])
@@ -61,7 +78,10 @@ with open('./sorted_example_alignment.txt', 'r') as f:
                     if pos == 1:  # will need to pad
                         data.append(interested)
 
-print(len(data))
+os.remove(f"{current_directory}/sorted_alignment.txt")
+
+print("Trimming done")
+print("Length of data: ", len(data))
 
 with open("output.pkl", "wb") as file:
     pickle.dump(data, file)

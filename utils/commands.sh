@@ -1,24 +1,22 @@
-minimap2 -a $2 $1 > alignment.sam
-samtools view -@ 4 -Sb -o example_alignment.bam alignment.sam
-samtools sort -O bam -o sorted_example_alignment.bam example_alignment.bam
+#!/bin/bash
 
-samtools bam2fq sorted_example_alignment.bam > minimap_samtools_out.fastq
-gzip minimap_samtools_out.fastq
-gunzip -c minimap_samtools_out.fastq.gz | chopper -q 1 --minlength 150 --maxlength 1000 | gzip > filtered_reads.fastq.gz
-gunzip filtered_reads.fastq.gz
+temp="$3/temp"
 
-minimap2 -a $2 filtered_reads.fastq > alignment2.sam
-samtools view -@ 4 -Sb -o example_alignment2.bam alignment2.sam
-samtools sort -O bam -o sorted_example_alignment2.bam example_alignment2.bam
-samtools view sorted_example_alignment2.bam > sorted_example_alignment.txt
+mkdir $temp
 
-rm sorted_example_alignment.bam
-rm example_alignment.bam
-rm alignment.sam
+echo "$temp/alignment.sam"
+minimap2 -a $2 $1 > $temp/alignment.sam
+samtools view -@ 4 -Sb -o $temp/temp_alignment.bam $temp/alignment.sam
+samtools sort -O bam -o $temp/sorted_temp_alignment.bam $temp/temp_alignment.bam
 
-rm minimap_samtools_out.fastq.gz
-rm filtered_reads.fastq
+samtools bam2fq $temp/sorted_temp_alignment.bam > $temp/minimap_samtools_out.fastq
+gzip $temp/minimap_samtools_out.fastq
+gunzip -c $temp/minimap_samtools_out.fastq.gz | chopper -q 1 --minlength 150 --maxlength 1000 | gzip > $temp/filtered_reads.fastq.gz
+gunzip $temp/filtered_reads.fastq.gz
 
-rm sorted_example_alignment2.bam
-rm example_alignment2.bam
-rm alignment2.sam
+minimap2 -a $2 $temp/filtered_reads.fastq > $temp/alignment2.sam
+samtools view -@ 4 -Sb -o $temp/temp_alignment2.bam $temp/alignment2.sam
+samtools sort -O bam -o $temp/sorted_temp_alignment2.bam $temp/temp_alignment2.bam
+samtools view $temp/sorted_temp_alignment2.bam > sorted_alignment.txt
+
+rm -rf $temp
