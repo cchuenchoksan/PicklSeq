@@ -6,6 +6,19 @@ import sys
 import argparse
 import os
 
+print()
+print("ooooooooo.    o8o            oooo        oooo   .oooooo..o                     ")
+print("`888   `Y88.  `''            `888        `888  d8P'    `Y8                     ")
+print(" 888   .d88' oooo   .ooooo.   888  oooo   888  Y88bo.       .ooooo.   .ooooo oo")
+print(" 888ooo88P'  `888  d88' `'Y8  888 .8P'    888   `'Y8888o.  d88' `88b d88' `888 ")
+print(" 888          888  888        888888.     888       `'Y88b 888ooo888 888   888 ")
+print(" 888          888  888   .o8  888 `88b.   888  oo     .d8P 888    .o 888   888 ")
+print("o888o        o888o `Y8bod8P' o888o o888o o888o 8888888P'  `Y8bod8P' `V8bod888 ")
+print("                                                                           888.")
+print("                                                                           8P' ")
+print("                                                                           '   ")
+
+
 current_file = os.path.abspath(__file__)
 current_directory = os.path.dirname(current_file)
 
@@ -19,9 +32,12 @@ parser.add_argument('-M', '--maxlength',
                     help='max length of acceptable DNA sequence')
 parser.add_argument('-q', '--quality', help='quality of Chopper reads')
 parser.add_argument('-T', '--threads', help='number of CPU threads')
-parser.add_argument('-c', '--matchcount', help='number of the number of CIGAR matches')
-parser.add_argument('-p', '--pad', help='pad the start of the DNA sequence when pos is not 1', action='store_true')
-parser.add_argument('-k', '--keep', help='keep subprocess file output', action='store_true')
+parser.add_argument('-c', '--matchcount',
+                    help='number of the number of CIGAR matches')
+parser.add_argument(
+    '-p', '--pad', help='pad the start of the DNA sequence when pos is not 1', action='store_true')
+parser.add_argument(
+    '-k', '--keep', help='keep subprocess file output', action='store_true')
 args = parser.parse_args()
 
 # Find fastq file
@@ -81,14 +97,16 @@ if args.threads != None:
     threads = args.threads
 else:
     threads = math.ceil(0.5 * os.cpu_count())
-    print(f"WARNING: You did not supply a threads parameter. Defaulting to {threads} out of {os.cpu_count()} available cores.")
+    print(
+        f"WARNING: You did not supply a threads parameter. Defaulting to {threads} out of {os.cpu_count()} available cores.")
 
 # Take length matchcount
 if args.matchcount != None:
-    match_count = args.matchcount
+    match_count = int(args.matchcount)
 else:
-    match_count = int(seq_len / 4)
-    print(f"WARNING: You did not supply a match count parameter. Defaulting to {match_count}.")
+    match_count = int(seq_len / 1.25)
+    print(
+        f"WARNING: You did not supply a match count parameter. Defaulting to {match_count}.")
 
 
 # ----------Read fasta---------------
@@ -130,9 +148,11 @@ def get_match_count(cigar_nums, cigar_alphas):
             output += int(num)
     return output
 
+
 def pad_start(dna_seq, starting_postion, type):
     full_seq = clone_seq_dict[type]
     return full_seq[:starting_postion - 1] + dna_seq
+
 
 data = []
 with open(f"{current_directory}/sorted_alignment.txt", "r") as f:
@@ -154,9 +174,11 @@ with open(f"{current_directory}/sorted_alignment.txt", "r") as f:
                 if get_match_count(cigar_nums, cigar_alphas) > match_count:
                     if args.pad:
                         dna_seq = pad_start(dna_seq, pos, line_array[2])
-                        data.append([line_array[2], cigar_str, dna_seq[:seq_len]])
+                        data.append(
+                            [line_array[2], cigar_str, dna_seq[:seq_len]])
                     elif pos == 1:
-                        data.append([line_array[2], cigar_str, dna_seq[:seq_len]])
+                        data.append(
+                            [line_array[2], cigar_str, dna_seq[:seq_len]])
 
 if not args.keep:
     os.remove(f"{current_directory}/sorted_alignment.txt")
