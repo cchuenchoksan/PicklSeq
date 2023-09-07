@@ -161,4 +161,6 @@ cython_debug/
 
 *.fastq
 *.pkl
+*.txt
 playground.*
+temp/
