@@ -2,6 +2,13 @@
 A python command line tool to turn a fastq and fasta to a pickle file for ML or other stuff.
 Currently, only mac is fully supported, unix based os should also work as well but no tests have been done on it.
 
+Current implement implementation only allow the following clones:
+1. CRT
+2. DHFR
+3. DHPS
+
+Future implementation will allow any fasta file as the input.
+
 # Installation
 1. Clone this repo.
 2. install minimap2: https://github.com/lh3/minimap2
@@ -10,11 +17,13 @@ Currently, only mac is fully supported, unix based os should also work as well b
 
 tip: Use homebrew for Mac
 
+*you could also alias the python picklseq.py command in your bash profile for ease of use. 
+
 Version used during development:
-Python 3.11.3
-minimap2 2.26-r1175
-samtools 1.17 Using htslib 1.17
-chopper 0.5.0
+1. Python 3.11.3
+2. minimap2 2.26-r1175
+3. samtools 1.17 Using htslib 1.17
+4. chopper 0.5.0
 
 # Run
 Run picklseq.py to trim sequences to a pickl file
