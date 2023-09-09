@@ -17,6 +17,6 @@ gunzip $temp/filtered_reads.fastq.gz
 minimap2 -t $6 -a $2 $temp/filtered_reads.fastq > $temp/alignment2.sam
 samtools view -@ $6 -Sb -o $temp/temp_alignment2.bam $temp/alignment2.sam
 samtools sort -@ $6 -O bam -o $temp/sorted_temp_alignment2.bam $temp/temp_alignment2.bam
-samtools view -@ $6 $temp/sorted_temp_alignment2.bam > sorted_alignment.txt
+samtools view -@ $6 $temp/sorted_temp_alignment2.bam > ./sorted_alignment.txt
 
 rm -rf $temp

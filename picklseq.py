@@ -25,6 +25,7 @@ current_directory = os.path.dirname(current_file)
 # ---------- Take arguments---------------
 parser = argparse.ArgumentParser(description='A script to trim DNA sequences')
 parser.add_argument('-f', '--file', help='The file name of the fastq')
+parser.add_argument('-o', '--fileout', help='The file name of the file output')
 parser.add_argument('-t', '--type', help='The type of the DNA sequence')
 parser.add_argument('-m', '--minlength',
                     help='min length of acceptable DNA sequence')
@@ -124,6 +125,8 @@ with open(fasta_file, "r") as f:
 # ----------Run Subprocess---------------
 print("\nRunning subprocess...")
 
+print("current_dir:", current_directory)
+
 process = subprocess.Popen(['bash', f"{current_directory}/utils/commands.sh", file_name,
                            fasta_file, current_directory, str(min_length), str(max_length), str(quality), str(threads)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 stdout, stderr = process.communicate()
@@ -155,7 +158,7 @@ def pad_start(dna_seq, starting_postion, type):
 
 
 data = []
-with open(f"{current_directory}/sorted_alignment.txt", "r") as f:
+with open(f"./sorted_alignment.txt", "r") as f:
     for line in f:
         line_array = line.split('\t')
         flag = int(line_array[1])
@@ -181,10 +184,15 @@ with open(f"{current_directory}/sorted_alignment.txt", "r") as f:
                             [line_array[2], cigar_str, dna_seq[:seq_len]])
 
 if not args.keep:
-    os.remove(f"{current_directory}/sorted_alignment.txt")
+    os.remove(f"./sorted_alignment.txt")
 
 print("Trimming done")
 print("Length of data: ", len(data))
 
-with open("output.pkl", "wb") as file:
+if args.fileout != None:
+    file_out = args.fileout
+else:
+    file_out = "output.pkl"
+
+with open(file_out, "wb") as file:
     pickle.dump(data, file)
