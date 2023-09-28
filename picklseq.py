@@ -26,7 +26,7 @@ current_directory = os.path.dirname(current_file)
 parser = argparse.ArgumentParser(description='A script to trim DNA sequences')
 parser.add_argument('-f', '--file', help='The file name of the fastq')
 parser.add_argument('-o', '--fileout', help='The file name of the file output')
-parser.add_argument('-t', '--type', help='The type of the DNA sequence')
+parser.add_argument('-t', '--type', help='The type of the DNA sequence. Could be CRT, DHPS, or DHFR. Alternatively, you could provide a .fasta file.')
 parser.add_argument('-m', '--minlength',
                     help='min length of acceptable DNA sequence')
 parser.add_argument('-M', '--maxlength',
@@ -50,23 +50,37 @@ else:
 
 # Take seq type
 if args.type != None:
-    seq_type = args.type.upper()
+    seq_type = args.type
 else:
     print(f"WARNING: A sequence type was not given. Defaulting to CRT.")
     seq_type = "CRT"
 
-if seq_type == "DHPS":
+seq_len = 0
+if seq_type.upper() == "DHPS":
     fasta_file = f"{current_directory}/utils/DHPS.fasta"
     seq_len = 642
-elif seq_type == "DHFR":
+elif seq_type.upper() == "DHFR":
     fasta_file = f"{current_directory}/utils/DHFR.fasta"
     seq_len = 491
-elif seq_type == "CRT":
+elif seq_type.upper() == "CRT":
     fasta_file = f"{current_directory}/utils/CRT.fasta"
     seq_len = 178
+elif re.match(r'[A-Za-z0-9]+.(fasta|FASTA)', seq_type):
+    print("A fasta file was selected...")
+    fasta_file = f"./{seq_type}"
+    with open(fasta_file, "r") as f:
+        dna_regex = r"^[ATCG]+$"
+        for line in f:
+            if re.match(dna_regex, line.strip()):
+                seq_len = len(line.strip())
+    if seq_len == 0:
+        print("There was a problem reading your fasta file. Please check the format of your fasta file and try again.")
+        sys.exit()
+    else:
+        print(f"Sequence length: {seq_len}")
 else:
     print(
-        f"WARNING: The sequence type {seq_type} is not recognised by the script. Defaulting to CRT.")
+        f"WARNING: The sequence type {seq_type.upper()} is not recognised by the script. Defaulting to CRT.")
     fasta_file = f"{current_directory}/utils/CRT.fasta"
     seq_len = 178
 
@@ -121,11 +135,12 @@ with open(fasta_file, "r") as f:
         else:
             clone_names.append(line.strip()[1:])
     clone_seq_dict = {key: value for key, value in zip(clone_names, sequences)}
+    print(f"Target clones: {clone_names}")
 
 # ----------Run Subprocess---------------
 print("\nRunning subprocess...")
 
-print("current_dir:", current_directory)
+print("current directory of picklseq:", current_directory)
 
 process = subprocess.Popen(['bash', f"{current_directory}/utils/commands.sh", file_name,
                            fasta_file, current_directory, str(min_length), str(max_length), str(quality), str(threads)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)

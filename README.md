@@ -28,15 +28,18 @@ Version used during development:
 # Run
 Run picklseq.py to trim sequences to a pickl file
 ```
-usage: picklseq.py [-h] [-f FILE] [-t TYPE] [-m MINLENGTH] [-M MAXLENGTH] [-q QUALITY] [-T THREADS] [-c MATCHCOUNT]
-                   [-p] [-k]
+usage: picklseq.py [-h] [-f FILE] [-o FILEOUT] [-t TYPE] [-m MINLENGTH] [-M MAXLENGTH] [-q QUALITY]
+                   [-T THREADS] [-c MATCHCOUNT] [-p] [-k]
 
 A script to trim DNA sequences
 
 options:
   -h, --help            show this help message and exit
   -f FILE, --file FILE  The file name of the fastq
-  -t TYPE, --type TYPE  The type of the DNA sequence
+  -o FILEOUT, --fileout FILEOUT
+                        The file name of the file output
+  -t TYPE, --type TYPE  The type of the DNA sequence. Could be CRT, DHPS, or DHFR. Alternatively, you could
+                        provide a .fasta file.
   -m MINLENGTH, --minlength MINLENGTH
                         min length of acceptable DNA sequence
   -M MAXLENGTH, --maxlength MAXLENGTH
