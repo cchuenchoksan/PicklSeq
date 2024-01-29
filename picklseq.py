@@ -65,7 +65,7 @@ elif seq_type.upper() == "DHFR":
 elif seq_type.upper() == "CRT":
     fasta_file = f"{current_directory}/utils/CRT.fasta"
     seq_len = 178
-elif re.match(r'[A-Za-z0-9]+.(fasta|FASTA)', seq_type):
+elif re.match(r'[A-Za-z0-9_]+.(fasta|FASTA)', seq_type):
     print("A fasta file was selected...")
     fasta_file = f"./{seq_type}"
     with open(fasta_file, "r") as f:
